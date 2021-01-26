@@ -521,7 +521,7 @@ notes:: check points arg on draw-poly
 ;; from 1 - 7, with 3 being interpreted as "Normal" (leaving 2 smaller and 4 larger sizes)
 ;;
 (defvar *bfd-font-size-names*
-  (vector "Smallest" "Smaller" "Normal" "Larger" "Larger2" "Larger3" "Largest"))
+  (vector 8 9 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 66 68 70 72 74))
 
 ;; these need to be in sync (used to initialize the font size menu)
 ;; see also font-size-menu-item-name
@@ -533,13 +533,14 @@ notes:: check points arg on draw-poly
 ;; NOTE: we an get size 7 when loading old mac boxes...
 (defun %font-size-to-idx (size)
   (cond ((<=& size  8) size)  ;; sgithens: support for relative size saving, see comments on *dump-relative-font-sizes?* in dumper.lisp
-        ((<=& size  9) 1)
-        ((<=& size 10) 2)
-        ((<=& size 12) 3)
-        ((<=& size 14) 4)
-        ((<=& size 16) 5)
-        ((<=& size 20) 6)
-        ((<=& size 24) 7)
+        ((<=& size 12) 1) ; Smallest
+        ((<=& size 14) 2) ; Smaller
+        ((<=& size 16) 3) ; Normal
+        ((<=& size 20) 4) ; Larger
+        ((<=& size 22) 5) ; Larger2
+        ((<=& size 26) 6) ; Larger3
+        ((<=& size 30) 7) ; Largest
+
         ((<=& size 28) 8)
         ((<=& size 32) 9)
         ((<=& size 40) 10)
@@ -547,7 +548,11 @@ notes:: check points arg on draw-poly
         ((<=& size 56) 12)
         (t 13)))
 
-(defvar *font-sizes* (vector 8 9 10 12 14 16 20 24 28 32 40 48 56 64)) ;(vector 6 8 10 12 14 16 18 24)
+;; (defvar *font-sizes* (vector 8 9 10 12 14 16 20 24 28 32 40 48 56 64)) ;(vector 6 8 10 12 14 16 18 24)
+;;                             Sest Smlr N    L    L2   L3   Lest
+;; (defvar *font-sizes* (vector 8 12   14   16   20   22   26   30    28 32 40 48 56 64)) ;(vector 6 8 10 12 14 16 18 24)
+(defvar *font-sizes* (vector 8 9 10 12 14 16 18 20 22 24 26 28 30 32 34 36 38 40 42 44 46 48 50 52 54 56 58 60 62 64 66 68 70 72 74)) ;(vector 6 8 10 12 14 16 18 24)
+
 
 ;; "size" is the size value returned from font-values of a relative font (used in BFD's)
 ;; abstract through this function to allow for more complicated translations, perhaps skipping
@@ -557,18 +562,20 @@ notes:: check points arg on draw-poly
 (defun %font-size-idx-to-size (sidx) (svref *font-sizes* sidx))
 
 (defun make-size-menu-names ()
-  (let* ((sl (length *font-sizes*))
-         (n-sizes (- sl 6)) ;; number of possible size settings
-         (names-array (make-array n-sizes))
-         (menu-length (length *bfd-font-size-names*)))
-    (dotimes (i n-sizes)
-      (let ((names (make-list menu-length)))
-        (setf (svref names-array i) names)
-        (dotimes (j menu-length)
-          (let ((size-name (svref *bfd-font-size-names* j)))
-            (setf (nth j names)
-                  (format nil "~A (~D)" size-name (svref *font-sizes* (+ i j))))))))
-    names-array))
+  #1A( "8" "9" "10" "12" "14" "16" "18" "20" "22" "24" "26" "28" "30" "32" "34" "36" "38" "40" "42" "44" "46" "48" "50" "52" "54" "56" "58" "60" "62" "64" "66" "68" "70" "72" "74"))
+
+  ;; (let* ((sl (length *font-sizes*))
+  ;;        (n-sizes sl );;(- sl 6)) ;; number of possible size settings
+  ;;        (names-array (make-array n-sizes))
+  ;;        (menu-length (length *bfd-font-size-names*)))
+  ;;   (dotimes (i n-sizes)
+  ;;     (let ((names (make-list menu-length)))
+  ;;       (setf (svref names-array i) names)
+  ;;       (dotimes (j menu-length)
+  ;;         (let ((size-name (svref *bfd-font-size-names* j)))
+  ;;           (setf (nth j names)
+  ;;                 (format nil "~A (~D)" size-name (svref *font-sizes* (+ i j))))))))
+  ;;   names-array))
 
 (defvar *font-size-menu-names* (make-size-menu-names))
 

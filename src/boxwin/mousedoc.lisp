@@ -272,7 +272,7 @@
      (unless (eq *current-mouse-doc* :graphics)
        (setq *current-mouse-doc* :graphics)
         (when *change-mouse-on-hotspots* (set-mouse-cursor-internal :normal)))
-     (unless popup-only? (mouse-doc-graphics))
+     (unless popup-only? (mouse-doc-graphics) (set-mouse-cursor :fluer))
      ;(boxer::popup-doc-graphics screen-box popup-only?)
      )
     (:sprite

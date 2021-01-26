@@ -599,8 +599,11 @@ Modification History (most recent at the top)
 
 ;; a file-fd is a list
 (defun make-bfd-from-file (file-fd)
-  (make-cfd (car file-fd) (make-boxer-font (cadr file-fd))
-            (reallocate-pixel-color (caddr file-fd))))
+  (format t "~%loader:make-bfd-from-file: ~A" file-fd)
+  (let ((togo (make-cfd (car file-fd) (make-boxer-font (cadr file-fd))
+                (reallocate-pixel-color (caddr file-fd)))))
+    (format t "~%  make-cfd: ~A" togo)
+    togo))
 
 #|
 (defun load-name-row (stream &optional (length (bin-next-value stream)))

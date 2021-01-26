@@ -1062,7 +1062,12 @@
 |#
 
 
-
+(defun redraw-cursor (&optional (cursor *point*)(flush-buffer? T))
+  (drawing-on-window (*boxer-pane*)
+                     (opengl::gl-draw-buffer opengl::*gl-front*)
+                     (draw-blinker *point-blinker* bw::*insert-blinker-color*)
+                     (opengl::gl-flush)
+                     (opengl::gl-draw-buffer opengl::*gl-back*)))
 
 ;;;; Ephemera: cursors, regions
 (defun repaint-cursor (&optional (cursor *point*)(flush-buffer? T))
@@ -1070,7 +1075,7 @@
                      ;; this updates the position & size
                      (repaint-cursor-internal cursor)
                      ;; now draw it
-                     (draw-blinker *point-blinker*)
+                    ;;  (draw-blinker *point-blinker*)
                      (when flush-buffer? (flush-port-buffer *boxer-pane*))))
 
 (defun repaint-cursor-internal (&optional (cursor *point*))
@@ -1133,7 +1138,7 @@
                                               )))))
 
 
-(defvar *default-cursor-width* 3)
+(defvar *default-cursor-width* 1)
 (defvar *unseen-box-cursor-height* 17)
 
 ;; returns width, height & offset-from-top

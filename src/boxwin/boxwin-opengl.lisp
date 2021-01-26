@@ -160,6 +160,8 @@ Modification History (most recent at top)
 (defvar *blinker-alpha-value* .3)
 
 (defvar *blinker-color* (make-ogl-color .3 .3 .9 .5))
+;; (defvar *blinker-color* (boxer::%make-color-from-bytes #xC1 #xDA #xFF #x00))
+
 
 (defun update-blinker-color ()
   #+win32
@@ -211,13 +213,13 @@ Modification History (most recent at top)
                                           :popup-callback 'set-font-size-menu-selection
                                           ; :items box::*bfd-font-size-values*
                                           ; :print-function 'box::font-size-menu-item-name
-                                          :items
-                                          (mapcar #'(lambda (data)
-                                                      (make-instance 'capi:menu-item
-                                                                     :data data
-                                                                     :print-function
-                                                                     'box::font-size-menu-item-name))
-                                                  boxer::*bfd-font-size-values*)
+                                          :items boxer::*bfd-font-size-names*
+                                          ;; (mapcar #'(lambda (data)
+                                          ;;             (make-instance 'capi:menu-item
+                                          ;;                            :data data
+                                          ;;                            :print-function
+                                          ;;                            'box::font-size-menu-item-name))
+                                          ;;         boxer::*bfd-font-size-values*)
                                       :callback 'font-size-menu-action)))))
 ;                 :items
 ;                 (list (make-instance 'capi::menu-component
@@ -808,6 +810,8 @@ Modification History (most recent at top)
       (start-boxer-progress "Starting Command Loop ~D" (get-internal-real-time) 100)
       (sleep 1)
       (capi:destroy progress-bar)
+      (reset-mouse-cursor)
+      (mp:schedule-timer *cursor-blink-timer* 1 0.6)
       (boxer-process-top-level-fn *boxer-pane*))))
 
 ;; check cdr of SYSTEM:*LINE-ARGUMENTS-LIST*
@@ -1412,6 +1416,10 @@ Modification History (most recent at top)
 (defun gesture-spec-handler (w x y gesture)
   (declare (ignore w x y))
   ;; reset any popup docs...
+(format t "sgithens gspec [ ~A ]"
+                                (with-output-to-string (out)
+                                  (sys:print-pretty-gesture-spec gesture out)))
+
   (next-event-id)
   (undocument-mouse)
   (save-key gesture)
@@ -1665,7 +1673,12 @@ Modification History (most recent at top)
 (defun set-mouse-cursor-internal (cursor)
   ;; These are all currently referenced at some point in the code from previous
   ;; eras. We'll need to revisit them with some UI design. - sgithens 2020-10-09
+  (format t "~%sgithens cursor: ~A~%" cursor)
   (cond
+    ((eq cursor :fluer)
+     (setf (capi:simple-pane-cursor *boxer-pane*) :fluer))
+    ((eq cursor :eval)
+     (setf (capi:simple-pane-cursor *boxer-pane*) :busy)) ; TODO
     ((eq cursor :retarget) ; retarget is when we are choosing the box target for a new port
      (setf (capi:simple-pane-cursor *boxer-pane*) :crosshair))
     ((eq cursor :hotspot) nil) ; TODO
@@ -1678,7 +1691,7 @@ Modification History (most recent at top)
 
 (defun reset-mouse-cursor ()
   "Sets the current mouse cursor back to the system default."
-  (setf (capi:simple-pane-cursor *boxer-pane*) nil))
+  (setf (capi:simple-pane-cursor *boxer-pane*) :i-beam))
 
 ;;;; Blinkers, mostly copied from clx
 
@@ -1727,8 +1740,9 @@ Modification History (most recent at top)
 ;; for now, enable alpha blending for regions...
 ;(gl-enable *gl-blend*)
 
-(defun draw-blinker (blinker)
-  (with-pen-color (*blinker-color*)
+(defun draw-blinker (blinker &optional (blinker-color *blinker-color*))
+  ;; (format t "~%draw-blinker ~A" blinker)
+  (with-pen-color (blinker-color)
     (box::with-blending-on
       (box::draw-rectangle alu-seta
                            (blinker-width blinker) (blinker-height blinker)
@@ -1751,6 +1765,7 @@ Modification History (most recent at top)
     blinker))
 
 (defun draw-region-row-blinker (blinker)
+  (format f "~%draw-region-row-blinker ~A" blinker)
   (box::draw-rectangle alu-xor
    (blinker-width blinker) (blinker-height blinker)
    (blinker-x blinker)     (blinker-y blinker)))
@@ -1917,3 +1932,22 @@ Modification History (most recent at top)
             (*standard-output* stream)
             (*debug-io* stream))
         (write-crash-report-internal stream)))))
+
+;;;
+;;; Blinking cursor hacking..
+;;;
+(defvar *cursor-blink-on* t)
+(defvar *insert-blinker-color* (bw::make-ogl-color 0 0 0 1)
+  "Color for the single insert color. The selected blinker region and other bits use
+  *blinker-color*.")
+
+(defun flip-cursor ()
+  (ignore-errors (progn
+    (if *cursor-blink-on*
+      (setf bw::*insert-blinker-color* (bw::make-ogl-color 1 1 1 1))
+      (setf bw::*insert-blinker-color* (bw::make-ogl-color 0 0 0 1)))
+    (setf *cursor-blink-on* (not *cursor-blink-on*))
+    (boxer::redraw-cursor))))
+
+(defvar *cursor-blink-timer* (mp:make-timer 'flip-cursor))
+
