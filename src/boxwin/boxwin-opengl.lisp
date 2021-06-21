@@ -356,10 +356,81 @@
                                    #'(setf capi::display-pane-text)
                                    new-text message-pane))))
 
+
+
 (eval-when (compile load eval)
+
 (capi:define-interface boxer-frame ()
   ()
   (:panes
+   (text-toolbar
+    capi:toolbar
+    :enabled nil
+    :items (list ;; Font Selection
+                 (make-instance 'capi:toolbar-component
+                                :items (list change-font-toolbar-button))
+                 (make-instance 'capi:toolbar-component
+                                :items (list change-fontsize-toolbar-button))
+                 (make-instance 'capi:toolbar-component
+                                :items (list change-fontcolor-toolbar-button))
+
+                 (make-instance 'capi:toolbar-component
+                                :items (list (make-instance
+                                              'capi:toolbar-button
+                                              :text "B"
+                                              :selection-callback 'text-toolbar-toggle-callback
+                                              :retract-callback 'text-toolbar-toggle-callback))
+                                :interaction :multiple-selection)
+
+                 (make-instance 'capi:toolbar-component
+                                :items (list (make-instance
+                                              'capi:toolbar-button
+                                              :text "I"
+                                              :selection-callback 'text-toolbar-toggle-callback
+                                              :retract-callback 'text-toolbar-toggle-callback))
+                                :interaction :multiple-selection)
+
+
+                ;;  (make-instance 'capi:toolbar-button
+                ;;                 :text "Randomize Number"
+                ;;                 :selection-callback 'text-toolbar-switch-callback)
+                ;;  (make-instance 'capi:toolbar-button
+                ;;                 :data 1
+                ;;                 :selection-callback 'text-toolbar-number-callback)
+                ;;  (make-instance 'capi:toolbar-component
+                ;;                 :items (list change-font-toolbar-button))
+                                )
+    :callback-type :interface
+    ;; :title "Text"
+    ;; :title-position :frame
+   )
+   (change-font-toolbar-button
+    capi:toolbar-button
+    :text "Arial"
+    :callback-type :interface
+    :selection-callback #'(lambda (self)
+                            (capi:display-popup-menu
+                             (make-change-font-toolbar-button-menu self)))
+    :dropdown-menu-kind :delayed
+    :dropdown-menu (make-change-font-toolbar-button-menu capi:interface))
+   (change-fontsize-toolbar-button
+    capi:toolbar-button
+    :text "16"
+    :callback-type :interface
+    :selection-callback #'(lambda (self)
+                            (capi:display-popup-menu
+                             (make-change-fontsize-toolbar-button-menu self)))
+    :dropdown-menu-kind :delayed
+    :dropdown-menu (make-change-fontsize-toolbar-button-menu capi:interface))
+   (change-fontcolor-toolbar-button
+    capi:toolbar-button
+    :text "Black"
+    :callback-type :interface
+    :selection-callback #'(lambda (self)
+                            (capi:display-popup-menu
+                             (make-change-fontcolor-toolbar-button-menu self)))
+    :dropdown-menu-kind :delayed
+    :dropdown-menu (make-change-fontcolor-toolbar-button-menu capi:interface))
    (name-pane capi:title-pane :text "status line"
               :min-width nil :max-width :screen-width
               :visible-min-height *boxer-status-pane-height*
@@ -465,7 +536,7 @@
                ))
   (:layouts
    (boxer-layout capi:column-layout
-                 '(name-pane boxer-pane)
+                 '(text-toolbar name-pane boxer-pane)
                  :columns 1 :rows 2 :y-gap 1 :x-uniform-size-p t))
   ;; menu item actions are defined in lw-menu.lisp
   (:menus
