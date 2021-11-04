@@ -62,6 +62,18 @@
 
 ;; (load (merge-pathnames "run-tests.lisp" *boxer-project-dir*))
 
+(trace boxer::repaint-internal)
+(trace boxer::repaint-in-eval)
+(trace boxer::repaint-window)
+(trace boxer::repaint)
+(trace boxer::mouse-line-scroll-internal)
+(trace boxer::redisplaying-unit)
+(trace boxer::clear-window)
+(trace boxer::repaint-guts)
+(trace boxer::repaint-mouse-docs)
+(trace boxer::repaint-dev-overlay)
+(trace boxer::flush-port-buffer)
+
 (boxer-window::window-system-specific-make-boxer)
 (boxer-window::window-system-specific-start-boxer)
-(boxer-window::font-size-menu-action 3 nil)
+; (boxer-window::font-size-menu-action 3 nil)

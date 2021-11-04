@@ -1020,15 +1020,15 @@
 ;; if not fullscreen, pass-1 should clear changed areas
 ;; Note: should scrolling ops, pass in the box being scrolled as the changed area ?
 
-(defparameter *currently-repainting* nil
-  "Doing some testing to see if this is really a problem... simple nil/t values should be atomic.")
+; (defparameter *currently-repainting* nil
+;   "Doing some testing to see if this is really a problem... simple nil/t values should be atomic.")
 
 (defun repaint-internal (&optional just-windows?)
   ; (when *currently-repainting*
   ;   (format t "Why are we double repainting??"))
 
-  (unless *currently-repainting*
-    (setf *currently-repainting* t)
+  ; (unless *currently-repainting*
+  ;   (setf *currently-repainting* t)
     (let ((*complete-redisplay-in-progress?* t))
       (redisplaying-unit
       (dolist (redisplayable-window *redisplayable-windows*)
@@ -1048,8 +1048,8 @@
           (repaint-cursor *point* nil)))
       ;; swap buffers here, after all drawing is complete
       (flush-port-buffer *boxer-pane*)))
-      (setf *currently-repainting* nil)
-      )
+      ; (setf *currently-repainting* nil)
+      ; )
      )
 
 (defun repaint (&optional just-windows?)
@@ -1200,9 +1200,9 @@
 ;;;
 (defun repaint-in-eval (&optional force?)
   ;; if fast enuff...
-  (unless *currently-repainting*
+  ; (unless *currently-repainting*
     (bw::update-toolbar-font-buttons)
-    (setf *currently-repainting* t)
+    ; (setf *currently-repainting* t)
     (let ((now (get-internal-real-time)))
       (when (or force?
                 (and (>& now (+ *last-eval-repaint* *eval-repaint-quantum*))
@@ -1218,7 +1218,8 @@
             (funcall (pop bw::*suppressed-actions*)))
           (repaint-window *boxer-pane* t :process-state-label "eval")
           (setq *last-repaint-duration* (- (get-internal-real-time) now))))))
-    (setf *currently-repainting* nil)))
+    ; (setf *currently-repainting* nil))
+    )
 
 
 

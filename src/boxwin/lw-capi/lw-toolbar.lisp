@@ -37,7 +37,7 @@
          (font-button (slot-value *boxer-frame* 'change-font-toolbar-button))
          (size-button (slot-value *boxer-frame* 'change-fontsize-toolbar-button))
          (color-button (slot-value *boxer-frame* 'change-fontcolor-toolbar-button))
-         (status-bar (slot-value *boxer-frame* 'status-bar-pane))
+        ;  (status-bar (slot-value *boxer-frame* 'status-bar-pane))
          (current-color (boxer::bfd-color (get-current-font))))
 
     (setf (capi:choice-selected-item font-button)
@@ -66,8 +66,8 @@
            (setf (capi:toolbar-button-image stop-button) 2)))
 
     ;; Bottom Status Line
-    (setf (capi:title-pane-text status-bar)
-      (format nil "~A ~40tFont Zoom ~A%"
-        (vanilla-menu-item-print nil)
-        (round (* 100 boxer::*font-size-baseline*))))
+    ; (setf (capi:title-pane-text status-bar)
+    ;   (format nil "~A ~40tFont Zoom ~A%"
+    ;     (vanilla-menu-item-print nil)
+    ;     (round (* 100 boxer::*font-size-baseline*))))
   ))
