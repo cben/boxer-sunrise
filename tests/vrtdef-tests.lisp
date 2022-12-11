@@ -10,7 +10,7 @@
 ;; Basically the underlying struct is setup to be stored
 ;; as a plain vector, and the predicate we have essentially
 ;; depends on the length of this simple vector.
-(is (length (boxer::%make-vc-rows-entry)) 10)
+(is (length (boxer::%make-vc-rows-entry)) 11)
 
 
 (let ((vcr (boxer::%make-vc-rows-entry)))
