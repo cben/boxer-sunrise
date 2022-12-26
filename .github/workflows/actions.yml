@@ -1,0 +1,23 @@
+on: [push, pull_request]
+jobs:
+  SBCL-core-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup SBCL
+        uses: cheeze2000/setup-sbcl@v1
+        with:
+          version: 2.2.9
+      # setup-sbcl sets up quicklisp & asdf too.
+      - name: Run Boxer core tests
+        run: |-
+          # Normally, asdf tests exit with status 0 whether pass or fail.  See grep below.
+          # But sbcl does exit with status 1 on aborted compilation (e.g. function undefined).
+          set -o pipefail
+          sbcl --non-interactive --load ./run-core-tests.lisp 2>&1 | tee SBCL-core-tests.out
+      # Kludge: ensure non-zero exit status if tests failed.
+      # 
+      - name: Check output for failures
+        run: |-
+          grep --ignore-case --extended-regexp '^\s*All [0-9]+ files passed\.\s*$' SBCL-core-tests.out
