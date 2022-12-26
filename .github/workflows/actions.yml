@@ -20,4 +20,4 @@ jobs:
       # 
       - name: Check output for failures
         run: |-
-          ! grep --quiet --ignore-case fail SBCL-core-tests.out
+          grep --ignore-case --extended-regexp '^\s*All [0-9]+ files passed\.\s*$' SBCL-core-tests.out
